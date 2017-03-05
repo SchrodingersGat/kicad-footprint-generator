@@ -45,9 +45,9 @@ class PolygoneLine(Node):
         self.layer = kwargs.get('layer', 'F.SilkS')
         self.width = kwargs.get('width')
 
-        self.virtual_childs = self._createChildNodes(self.polygone_line)
+        self.virtual_childs = self._createChildNodes(self.polygone_line, **kwargs)
 
-    def _createChildNodes(self, polygone_line):
+    def _createChildNodes(self, polygone_line, **kwargs):
         nodes = []
 
         for line_start, line_end in zip(polygone_line, polygone_line[1:]):

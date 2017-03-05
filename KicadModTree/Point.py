@@ -28,14 +28,13 @@ class Point(object):
                     coordinates = [coordinates, y]
             else:
                 raise TypeError('you have to give at least x and y coordinate')
-
+        
         if isinstance(coordinates, Point):
             self.x = coordinates.x
             self.y = coordinates.y
             self.z = coordinates.z
-            return
 
-        if type(coordinates) is dict:
+        elif type(coordinates) is dict:
             self.x = float(coordinates.get('x', 0.))
             self.y = float(coordinates.get('y', 0.))
             self.z = float(coordinates.get('z', 0.))
@@ -56,17 +55,15 @@ class Point(object):
                 raise TypeError('invalid list size (to big)')
         else:
             raise TypeError('dict or list type required')
-                
+            
         self.grid=kwargs.get('grid',None)
-        #is a grid specified?
-        if type(grid) in [float,int]:
-            #ensure coordinates fall on a grid
-            self.x = int(self.x/grid) * grid
-            self.y = int(self.y/grid) * grid
-            self.z = int(self.z/grid) * grid
-
-
-
+        
+        # Apply grid 
+        if type(self.grid) in [float, int]:
+            self.x = int(self.x/self.grid) * self.grid
+            self.y = int(self.y/self.grid) * self.grid
+            self.z = int(self.z/self.grid) * self.grid
+                
     def __add__(self, obj):
         other_point = None
         if type(obj) in [int, float]:
