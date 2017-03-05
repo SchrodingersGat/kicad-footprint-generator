@@ -1,27 +1,33 @@
-'''
-kicad-footprint-generator is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-kicad-footprint-generator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
-
-(C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
-'''
+# KicadModTree is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# KicadModTree is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
+#
+# (C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
 
 from KicadModTree.util.kicad_util import formatFloat
 
 
 class Point(object):
-    def __init__(self, coordinates=None, **kwargs):
+    def __init__(self, coordinates=None, y=None, z=None, **kwargs):
         if coordinates is None:
             coordinates = {}
+        elif type(coordinates) in [int, float]:
+            if y is not None:
+                if z is not None:
+                    coordinates = [coordinates, y, z]
+                else:
+                    coordinates = [coordinates, y]
+            else:
+                raise TypeError('you have to give at least x and y coordinate')
 
         if isinstance(coordinates, Point):
             self.x = coordinates.x
@@ -30,28 +36,28 @@ class Point(object):
             return
 
         if type(coordinates) is dict:
-            self.x = float(coordinates.get('x', 0))
-            self.y = float(coordinates.get('y', 0))
-            self.z = float(coordinates.get('z', 0))
+            self.x = float(coordinates.get('x', 0.))
+            self.y = float(coordinates.get('y', 0.))
+            self.z = float(coordinates.get('z', 0.))
 
         elif type(coordinates) is list or type(coordinates) is tuple:
             if len(coordinates) >= 2:
-                self.x = coordinates[0]
-                self.y = coordinates[1]
+                self.x = float(coordinates[0])
+                self.y = float(coordinates[1])
             else:
                 raise TypeError('invalid list size (to small)')
 
             if len(coordinates) == 3:
-                self.z = coordinates[2]
+                self.z = float(coordinates[2])
             else:
-                self.z = 0
+                self.z = 0.
 
             if len(coordinates) > 3:
                 raise TypeError('invalid list size (to big)')
         else:
             raise TypeError('dict or list type required')
                 
-        grid=kwargs.get('grid',None)
+        self.grid=kwargs.get('grid',None)
         #is a grid specified?
         if type(grid) in [float,int]:
             #ensure coordinates fall on a grid
@@ -68,9 +74,9 @@ class Point(object):
         else:
             other_point = Point(obj)
 
-        return Point({'x':self.x + other_point.x
-                     ,'y':self.y + other_point.y
-                     ,'z':self.z + other_point.z})
+        return Point({'x': self.x + other_point.x,
+                      'y': self.y + other_point.y,
+                      'z': self.z + other_point.z})
 
     def __sub__(self, obj):
         other_point = None
@@ -79,9 +85,9 @@ class Point(object):
         else:
             other_point = Point(obj)
 
-        return Point({'x':self.x - other_point.x
-                     ,'y':self.y - other_point.y
-                     ,'z':self.z - other_point.z})
+        return Point({'x': self.x - other_point.x,
+                      'y': self.y - other_point.y,
+                      'z': self.z - other_point.z})
 
     def __mul__(self, obj):
         other_point = None
@@ -98,10 +104,9 @@ class Point(object):
         if other_point.z == 0:
             other_point.z = 1
 
-        return Point({'x':self.x * other_point.x
-                     ,'y':self.y * other_point.y
-                     ,'z':self.z * other_point.z})
-
+        return Point({'x': self.x * other_point.x,
+                      'y': self.y * other_point.y,
+                      'z': self.z * other_point.z})
 
     def __div__(self, obj):
         other_point = None
@@ -118,28 +123,23 @@ class Point(object):
         if other_point.z == 0:
             other_point.z = 1
 
-        return Point({'x':self.x / other_point.x
-                     ,'y':self.y / other_point.y
-                     ,'z':self.z / other_point.z})
-
+        return Point({'x': self.x / other_point.x,
+                      'y': self.y / other_point.y,
+                      'z': self.z / other_point.z})
 
     def __truediv__(self, obj):
         return self.__div__(obj)
 
-
     def render(self, formatcode):
-        return formatcode.format(x=formatFloat(self.x)
-                                ,y=formatFloat(self.y)
-                                ,z=formatFloat(self.z))
-
+        return formatcode.format(x=formatFloat(self.x),
+                                 y=formatFloat(self.y),
+                                 z=formatFloat(self.z))
 
     def __dict__(self):
-        return {'x':self.x, 'y':self.y, 'z':self.z}
-
+        return {'x': self.x, 'y': self.y, 'z': self.z}
 
     def __repr__(self):
         return self.render("Point (x={x}, y={y}, z={z})")
-
 
     def __str__(self):
         return self.render("(x={x}, y={y}, z={z})")

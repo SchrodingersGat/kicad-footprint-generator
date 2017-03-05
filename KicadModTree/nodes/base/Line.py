@@ -1,39 +1,53 @@
-'''
-kicad-footprint-generator is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-kicad-footprint-generator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
-
-(C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
-'''
+# KicadModTree is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# KicadModTree is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
+#
+# (C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
 
 from KicadModTree.Point import *
 from KicadModTree.nodes.Node import Node
 
 
 class Line(Node):
+    r"""Add a Line to the render tree
 
-    _width_default = 0.15    
-    _layer_default = "F.SilkS"
+    :param \**kwargs:
+        See below
+
+    :Keyword Arguments:
+        * *start* (``Point``) --
+          start point of the line
+        * *end* (``Point``) --
+          end point of the line
+        * *layer* (``str``) --
+          layer on which the line is drawn
+        * *width* (``float``) --
+          width of the line
+
+    :Example:
+
+    >>> from KicadModTree import *
+    >>> Line(start=[-1, 0], end=[-1, 0], layer='F.SilkS')
+    """
 
     def __init__(self, **kwargs):
         Node.__init__(self)
         self.start_pos = Point(kwargs['start'],**kwargs)
         self.end_pos = Point(kwargs['end'],**kwargs)
 
-        self.layer = kwargs.get('layer',self._layer_default)
-        self.width = kwargs.get('width',self._width_default)
+        self.layer = kwargs.get('layer', 'F.SilkS')
+        self.width = kwargs.get('width')
 
-
-    def calculateOutline(self):
+    def calculateBoundingBox(self):
         render_start_pos = self.getRealPosition(self.start_pos)
         render_end_pos = self.getRealPosition(self.end_pos)
 
@@ -42,8 +56,7 @@ class Line(Node):
         max_x = max([render_start_pos.x, render_end_pos.x])
         max_y = max([render_start_pos.y, render_end_pos.y])
 
-        return Node.calculateOutline({'min':Point(min_x, min_y), 'max':Point(max_x, max_y)})
-
+        return Node.calculateBoundingBox({'min': Point(min_x, min_y), 'max': Point(max_x, max_y)})
 
     def _getRenderTreeText(self):
         render_strings = ['fp_line']

@@ -1,17 +1,17 @@
-'''
-kicad-footprint-generator is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-kicad-footprint-generator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
-'''
+# KicadModTree is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# KicadModTree is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
+#
+# (C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
 
 import unittest
 
@@ -41,12 +41,12 @@ class PointTests(unittest.TestCase):
         self.assertEqual(p2_xy.y, 5)
         self.assertEqual(p2_xy.z, 0)
 
-        p3 = Point({'x':7, 'y':8, 'z':9})
+        p3 = Point({'x': 7, 'y': 8, 'z': 9})
         self.assertEqual(p3.x, 7)
         self.assertEqual(p3.y, 8)
         self.assertEqual(p3.z, 9)
 
-        p3_xy = Point({'x':7, 'y':8})
+        p3_xy = Point({'x': 7, 'y': 8})
         self.assertEqual(p3_xy.x, 7)
         self.assertEqual(p3_xy.y, 8)
         self.assertEqual(p3_xy.z, 0)
@@ -61,9 +61,19 @@ class PointTests(unittest.TestCase):
         self.assertEqual(p4.y, 2)
         self.assertEqual(p4.z, 3)
 
+        p5 = Point(1, 2, 3)
+        self.assertEqual(p5.x, 1)
+        self.assertEqual(p5.y, 2)
+        self.assertEqual(p5.z, 3)
+
+        p5_xy = Point(1, 2)
+        self.assertEqual(p5_xy.x, 1)
+        self.assertEqual(p5_xy.y, 2)
+        self.assertEqual(p5_xy.z, 0)
+
         # TODO: test float datatype
         # TODO: invalid type tests
-
+        # TODO: tests if int is always converted to float
 
     def testAdd(self):
         p1 = Point([1, 2, 3])
@@ -93,7 +103,6 @@ class PointTests(unittest.TestCase):
 
         # TODO: invalid type tests
 
-
     def testSub(self):
         p1 = Point([1, 2, 3])
         self.assertEqual(p1.x, 1)
@@ -121,7 +130,6 @@ class PointTests(unittest.TestCase):
         self.assertEqual(p5.z, 3)
 
         # TODO: invalid type tests
-
 
     def testMul(self):
         p1 = Point([1, 2, 3])

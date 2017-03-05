@@ -1,19 +1,17 @@
-'''
-kicad-footprint-generator is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-kicad-footprint-generator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
-
-(C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
-'''
+# KicadModTree is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# KicadModTree is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
+#
+# (C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
 
 from KicadModTree.Point import *
 from KicadModTree.nodes.Node import Node
@@ -21,6 +19,40 @@ from KicadModTree.util.kicad_util import lispString
 
 
 class Pad(Node):
+    r"""Add a Pad to the render tree
+
+    :param \**kwargs:
+        See below
+
+    :Keyword Arguments:
+        * *number* (``int``, ``str``) --
+          number/name of the pad
+        * *type* (``Pad.TYPE_THT``, ``Pad.TYPE_SMT``, ``Pad.TYPE_CONNECT``, ``Pad.TYPE_NPTH``) --
+          type of the pad
+        * *shape* (``Pad.SHAPE_CIRCLE``, ``Pad.SHAPE_OVAL``, ``Pad.SHAPE_RECT``, ``Pad.SHAPE_TRAPEZE``) --
+          shape of the pad
+        * *at* (``Point``) --
+          center position of the pad
+        * *rotation* (``float``) --
+          rotation of the pad
+        * *size* (``float``, ``Point``) --
+          size of the pad
+        * *offset* (``Point``) --
+          offset of the pad
+        * *drill* (``float``, ``Point``) --
+          drill-size of the pad
+        * *solder_paste_margin_ratio* (``float``) --
+          solder paste margin ratio of the pad
+        * *layers* (``Pad.LAYERS_SMT``, ``Pad.LAYERS_THT``, ``Pad.LAYERS_NPTH``) --
+          layers on which are used for the pad
+
+    :Example:
+
+    >>> from KicadModTree import *
+    >>> Pad(number=1, type=Pad.TYPE_THT, shape=Pad.SHAPE_RECT,
+    ...     at=[0, 0], size=[2, 2], drill=1.2, layers=Pad.LAYERS_THT)
+    """
+
     TYPE_THT = 'thru_hole'
     TYPE_SMT = 'smd'
     TYPE_CONNECT = 'connect'
@@ -33,6 +65,9 @@ class Pad(Node):
     SHAPE_TRAPEZE = 'trapezoid'
     _SHAPES = [SHAPE_CIRCLE, SHAPE_OVAL, SHAPE_RECT, SHAPE_TRAPEZE]
 
+    LAYERS_SMT = ['F.Cu', 'F.Mask', 'F.Paste']
+    LAYERS_THT = ['*.Cu', '*.Mask']
+    LAYERS_NPTH = ['*.Cu', '*.Mask']
 
     def __init__(self, **kwargs):
         Node.__init__(self)
@@ -43,14 +78,12 @@ class Pad(Node):
         self._initPosition(**kwargs)
         self._initSize(**kwargs)
         self._initOffset(**kwargs)
-        self._initDrill(**kwargs) # requires pad type and offset
+        self._initDrill(**kwargs)  # requires pad type and offset
         self._initSolderPasteMargin(**kwargs)
         self._initLayers(**kwargs)
 
-
     def _initNumber(self, **kwargs):
-        self.number = kwargs.get('number')
-
+        self.number = kwargs.get('number')  # default to an un-numbered pad
 
     def _initType(self, **kwargs):
         if not kwargs.get('type'):
@@ -59,7 +92,6 @@ class Pad(Node):
         if self.type not in Pad._TYPES:
             raise ValueError('{type} is an invalid type for pads'.format(type=self.type))
 
-
     def _initShape(self, **kwargs):
         if not kwargs.get('shape'):
             raise KeyError('shape not declared (like "shape=Pad.SHAPE_CIRCLE")')
@@ -67,14 +99,12 @@ class Pad(Node):
         if self.shape not in Pad._SHAPES:
             raise ValueError('{shape} is an invalid shape for pads'.format(shape=self.shape))
 
-
     def _initPosition(self, **kwargs):
         if not kwargs.get('at'):
             raise KeyError('center position not declared (like "at=[0,0]")')
         self.at = Point(kwargs.get('at'))
 
         self.rotation = kwargs.get('rotation', 0)
-
 
     def _initSize(self, **kwargs):
         if not kwargs.get('size'):
@@ -85,10 +115,8 @@ class Pad(Node):
         else:
             self.size = Point(kwargs.get('size'))
 
-
     def _initOffset(self, **kwargs):
-        self.offset = Point(kwargs.get('offset', [0,0]))
-
+        self.offset = Point(kwargs.get('offset', [0, 0]))
 
     def _initDrill(self, **kwargs):
         if self.type in [Pad.TYPE_THT, Pad.TYPE_NPTH]:
@@ -106,20 +134,17 @@ class Pad(Node):
             if kwargs.get('drill'):
                 pass  # TODO: throw warning because drill is not supported
 
-
     def _initSolderPasteMargin(self, **kwargs):
         self.solder_paste_margin_ratio = kwargs.get('solder_paste_margin_ratio', 0)
-
 
     def _initLayers(self, **kwargs):
         if not kwargs.get('layers'):
             raise KeyError('layers not declared (like "layers=[\'*.Cu\', \'*.Mask\', \'F.SilkS\']")')
-        self.layers=kwargs.get('layers')
+        self.layers = kwargs.get('layers')
 
-
-    def calculateOutline(self):
-        return Node.calculateOutline(self)
-
+    # calculate the outline of a pad
+    def calculateBoundingBox(self):
+        return Node.calculateBoundingBox(self)
 
     def _getRenderTreeText(self):
         render_strings = ['pad']

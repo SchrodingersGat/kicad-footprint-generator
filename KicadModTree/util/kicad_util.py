@@ -1,19 +1,17 @@
-'''
-kicad-footprint-generator is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-kicad-footprint-generator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
-
-(C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
-'''
+# KicadModTree is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# KicadModTree is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with kicad-footprint-generator. If not, see < http://www.gnu.org/licenses/ >.
+#
+# (C) 2016 by Thomas Pointhuber, <thomas.pointhuber@gmx.at>
 
 import time
 import re
@@ -29,14 +27,13 @@ def formatFloat(val):
 
 def lispString(string):
     '''
-    add quotation marks to string, when it include a white space
+    add quotation marks to string, when it include a white space or is empty
     '''
     if type(string) is not str:
         string = str(string)
 
-    for character in string:
-        if character in WHITESPACE_CHARACTERS:
-            return '"{}"'.format(string)
+    if len(string) == 0 or re.match(".*\s.*", string):
+        return '"{}"'.format(string.replace('"', '/"'))  # escape text
 
     return string
 
@@ -60,7 +57,7 @@ def lispTokenizer(input):
         if len(token) == 0:
             continue
 
-        if token[0]=='"':
+        if token[0] == '"':
             if in_string:
                 tokens[-1] += token[1:]
                 in_string = False
@@ -68,7 +65,7 @@ def lispTokenizer(input):
                 tokens.append(token[1:])
                 in_string = True
 
-        elif token[-1]=='"':
+        elif token[-1] == '"':
             if in_string:
                 tokens[-1] += token[:-1]
                 in_string = False
@@ -122,7 +119,7 @@ def parseLispString(input):
 
 def parseTimestamp(timestamp):
     raise NotImplemented()
-    return time.time() # TOOD
+    return time.time()  # TOOD
 
 
 def formatTimestamp(timestamp=None):
