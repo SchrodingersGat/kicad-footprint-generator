@@ -61,14 +61,14 @@ for pincount in range(6, 93, 3):
     cols = int(pincount / 3)
 
     pn_name = pn.format(n=pincount)
-    fp_name = "Nicomatic_{pn}_3x{col}x2.00mm_Angled".format(pn=pn_name, col=cols)
+    fp_name = "Nicomatic_DMM320_{pn}_3x{col}x2.00mm_Angled".format(pn=pn_name, col=cols)
 
     print(fp_name)
 
     kicad_mod = Footprint(fp_name)
-    description = "Nicomatic D321V series connector, " + pn_name + ", side entry type, through hole, Datasheet: {ds}".format(ds=datasheet)
+    description = "Nicomatic DMM320 series connector, " + pn_name + ", side entry type, through hole, Datasheet: {ds}".format(ds=datasheet)
     kicad_mod.setDescription(description)
-    kicad_mod.setTags('connector Nicomatic D321V')
+    kicad_mod.setTags('connector Nicomatic DMM320')
 
     # Connector Dimensions
     A = (cols - 1) * pitch
